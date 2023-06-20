@@ -1,50 +1,54 @@
-import { useState } from "react";
-import "./App.css";
-import Items from "./items";
 
-function App() {
-  let [text, setText] = useState("");
-  let [bttn, setBttn] = useState([]);
+import React, { useState } from 'react';
+import AddUserForm from './AddForm';
+import UserList from './userlist';
+import EditUserForm from './EditUserForm';
+import './App.css'
 
-  function handleChange(e) {
-    setText(e.target.value);
-    //  console.log(text);S
-  }
+const App = () => {
+  const [users, setUsers] = useState([]);
+  const [editing, setEditing] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  function handleSubmit() {
-    setBttn((oldeItmes) => {
-      return [...oldeItmes, text];
-    });
-    setText("");
-  }
-  function deleteChange(id) {
-    setBttn((oldeItmes) => {
-     return oldeItmes.filter((item, index)=>{
-      return index !== id;
-     })
-    })
-  }
+  const addUser = (user) => {
+    user.id = users.length + 1;
+    setUsers([...users, user]);
+  };
+
+  const editUser = (id) => {
+    setEditing(true);
+    setCurrentUser(users.find((user) => user.id === id));
+  };
+
+  const updateUser = (id, updatedUser) => {
+    setEditing(false);
+    setUsers(users.map((user) => (user.id === id ? updatedUser : user)));
+  };
+
+  const deleteUser = (id) => {
+    setUsers(users.filter((user) => user.id !== id));
+  };
+
+
 
   return (
-    <div className="App">
-      <div className="container">
-        <h1>ToDo List</h1>
-        <input
-          className="text"
-          value={text}
-          placeholder="Add your wish"
-          onChange={handleChange}
-        ></input>
-        <button onClick={handleSubmit}>+</button>
-
-        <ol>
-          {bttn.map((item,index) => {
-            return <Items key={index} id={index} items={item} onSelect={deleteChange} />;
-          })}
-        </ol>
-      </div>
+    <div>
+      {/* <h1 style={{backgroundColor: 'darkblue'}}>User Management</h1> */}
+      {editing ? (
+        <div className='editform-main'>
+         
+          <EditUserForm currentUser={currentUser} updateUser={updateUser} />
+        </div>
+      ) : (
+        <div className='adduser-container'>
+          
+          <AddUserForm addUser={addUser} />
+        </div>
+      )}
+     
+      <UserList users={users} editUser={editUser} deleteUser={deleteUser} />
     </div>
   );
-}
+};
 
 export default App;
